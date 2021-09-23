@@ -42,24 +42,26 @@ def get_duplicates(data, option, email_column_name, first_name_column_name, last
     # st.info("Duplicate found by Chat Link")
 
     for i,chat_link in enumerate(chat_links):
-        if chat_link.strip() in chat_links_set:
-            duplicate_found = True
-            # st.write(f"User with chat link ({chat_link}), email ({emails[i]}) - {first_names[i]} {last_names[i]} is repeated")
-            all_duplicates.add(f"{first_names[i]} {last_names[i]} - {emails[i]} - {chat_links[i]}")
-        else:
-            if option == "duplicate" and chat_link != "No Baobab account":
-                    chat_links_set.add(chat_link.strip())
+        if type(email) == str:
+            if chat_link.strip() in chat_links_set:
+                duplicate_found = True
+                # st.write(f"User with chat link ({chat_link}), email ({emails[i]}) - {first_names[i]} {last_names[i]} is repeated")
+                all_duplicates.add(f"{first_names[i]} {last_names[i]} - {emails[i]} - {chat_links[i]}")
+            else:
+                if option == "duplicate" and chat_link != "No Baobab account":
+                        chat_links_set.add(chat_link.strip())
 
     # duplicates base on first name and last name
     # st.info("Duplicate found by name")
     for i,first_name in enumerate(first_names):
-        if f"{first_name.strip()}{last_names[i].strip()}".lower().replace(" ","") in name_set:
-            duplicate_found = True
-            # st.write(f"User with name ({first_name.strip()} {last_names[i].strip()}) is repeated")
-            all_duplicates.add(f"{first_names[i]} {last_names[i]} - {emails[i]} - {chat_links[i]}")
-        else:
-            if option == "duplicate":
-                name_set.add(f"{first_name.strip()}{last_names[i].strip()}".lower().replace(" ",""))
+        if type(email) == str:
+            if f"{first_name.strip()}{last_names[i].strip()}".lower().replace(" ","") in name_set:
+                duplicate_found = True
+                # st.write(f"User with name ({first_name.strip()} {last_names[i].strip()}) is repeated")
+                all_duplicates.add(f"{first_names[i]} {last_names[i]} - {emails[i]} - {chat_links[i]}")
+            else:
+                if option == "duplicate":
+                    name_set.add(f"{first_name.strip()}{last_names[i].strip()}".lower().replace(" ",""))
     
     if not duplicate_found:
         st.write("No duplicates found within the document")
@@ -76,7 +78,7 @@ def get_duplicates(data, option, email_column_name, first_name_column_name, last
 
 
 if uploaded_file is not None:
-    data = pd.read_excel(uploaded_file, converters={"Mentee's Baobab Email":str})
+    data = pd.read_excel(uploaded_file, engine='openpyxl')
     # This should be used if we want to use the first row as the column names
     # header = data.iloc[0]
     # data = data[1:]
@@ -102,7 +104,7 @@ if uploaded_file is not None:
     uploaded_file2 = st.file_uploader('Upload second file')
     if uploaded_file2 is not None:
         # st.subheader("Here is your data")
-        data = pd.read_excel(uploaded_file2)
+        data = pd.read_excel(uploaded_file2,engine='openpyxl')
         # st.write(data)
         st.subheader("People who applied previously")
         get_duplicates(data, "comparison", email_column_name, first_name_column_name, last_name_column_name, chat_link_column_name)
